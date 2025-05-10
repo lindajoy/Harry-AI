@@ -1,8 +1,8 @@
 import { Component, inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { HeaderGenerationComponent } from '../header-generation/header-generation.component';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ChatService } from '../../services/chat.service';
-import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-chat-application',
@@ -34,13 +34,11 @@ export class ChatApplicationComponent {
     { value: "quirky", label: "quirky" },
     { value: "Too cool to care", label: "Too cool to care" },
     { value: "funny", label: "Funny" },
-
   ]
 
   generateResponse() {
     const formValue = this.formGroup.value ?? {};
     this.chatService.generateResponse(formValue).subscribe((response: any) => {
-      debugger;
        this.answer = response.response;
    })
   }
