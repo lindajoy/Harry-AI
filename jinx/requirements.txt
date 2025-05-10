@@ -9,3 +9,5 @@ nltk>=3.8.1 # For text processing and tokenization
 # install onnxruntime before installing `chromadb`
 chromadb==0.5.0 # Vector storage
 google-generativeai>=0.3.0  # For Gemini models
+fastapi~=0.115.12
+protobuf~=4.25.7
