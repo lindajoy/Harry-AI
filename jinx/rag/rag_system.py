@@ -43,7 +43,10 @@ class HarryPotterRAG:
         loader = DirectoryLoader(self.data_path, glob="**/*.md")
         documents = loader.load()
         print(f"📄 Loaded {len(documents)} documents")
+        for doc in documents:  # Preview first
+            print(f"📝 {doc.metadata['source']}")
         return documents
+
 
     def split_documents(self, documents: List[Document]) -> List[Document]:
         """Splits documents into overlapping text chunks for vector storage."""
@@ -118,3 +121,25 @@ class HarryPotterRAG:
         chunks = self.split_documents(documents)
         self.create_vectorstore(chunks, recreate=recreate)
         print("🏗️ Index build complete")
+
+# class DocumentLoader:
+#     def __init__(self, data_path: str):
+#         self.data_path = data_path
+#
+#     def load_documents(self) -> List[Document]:
+#         """Loads Markdown documents from the data directory."""
+#         loader = DirectoryLoader(self.data_path, glob="**/*.md")
+#         documents = loader.load()
+#         print(f"📄 Loaded {len(documents)} documents")
+#         return documents
+#
+# def main():
+#     DATA_PATH = "../data"
+#     loader = DocumentLoader(DATA_PATH)
+#     documents = loader.load_documents()
+#     # You can process the documents here if needed
+#     for doc in documents:  # Preview first 3
+#         print(f"📝 {doc.metadata['source']}")
+#
+# if __name__ == "__main__":
+#     main()
