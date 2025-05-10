@@ -19,14 +19,13 @@ Jinx uses a Retrieval-Augmented Generation system powered by Google's Gemini mod
 - Gen Z language styling for all content
 
 ### Requirements
-python-dotenv==1.0.1 langchain==0.2.2 langchain-community==0.2.3 langchain-google-genai>=0.0.6 unstructured[md]==0.17.2 nltk>=3.8.1 chromadb==0.5.0 google-generativeai>=0.3.0 fastapi<del>=0.115.12 protobuf</del>=4.25.7 python-magic==0.4.27
 
 ### Setup
 
 1. Install dependencies: `pip install -r requirements.txt`
 2. Set up your Google API credentials in a `.env` file or as environment variables
 3. Run the indexing pipeline to create vector embeddings of the content
-4. Start the API server to handle queries
+4. Start the API server: `uvicorn server.websocket_server:app --reload`
 
 ## Arcane - Angular Frontend
 
