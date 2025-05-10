@@ -2,7 +2,7 @@ python-dotenv==1.0.1 # For reading environment variables stored in .env file
 langchain==0.2.2
 langchain-community==0.2.3
 langchain-google-genai>=0.0.6 # For Gemini models
-unstructured==0.17.2 # Document loading
+unstructured[md]==0.17.2  # Document loading with Markdown support
 nltk>=3.8.1 # For text processing and tokenization
 # onnxruntime==1.17.1 # chromadb dependency: on Mac use `conda install onnxruntime -c conda-forge`
 # For Windows users, install Microsoft Visual C++ Build Tools first
