@@ -1,5 +1,6 @@
 import os
 import shutil
+import time
 from typing import List
 import nltk
 
@@ -62,39 +63,20 @@ class HarryPotterRAG:
         return chunks
 
     def create_vectorstore(self, chunks: List[Document], recreate: bool = False) -> None:
-        """Builds a vector store (Chroma DB) from document chunks."""
+        """Create a vector store from document chunks"""
+        # Clear existing database if requested
         if recreate and os.path.exists(self.chroma_path):
             shutil.rmtree(self.chroma_path)
-            print(f"🧹 Existing vector store at {self.chroma_path} cleared")
+            print(f"Removed existing database at {self.chroma_path}")
 
-        # 🚀 NEW: Parallel embedding
-        embeddings = self.embed_all_chunks(chunks)
-
-        # Build from precomputed embeddings
-        self.vectorstore = Chroma.from_embeddings(
-            embeddings=embeddings,
+        # Create and persist the vector store
+        self.vectorstore = Chroma.from_documents(
             documents=chunks,
+            embedding=self.embedding_model,
             persist_directory=self.chroma_path
         )
         self.vectorstore.persist()
-        print(f"✅ Vector store created with {len(chunks)} chunks")
-
-    def embed_all_chunks(self, chunks: List[Document], max_workers: int = 5) -> List[List[float]]:
-        """Embeds all document chunks in parallel."""
-        print(f"🚀 Embedding {len(chunks)} chunks with {max_workers} workers...")
-
-        def embed_chunk(chunk):
-            return self.embedding_model.embed_documents([chunk.page_content])[0]
-
-        embeddings = []
-        with ThreadPoolExecutor(max_workers=max_workers) as executor:
-            futures = [executor.submit(embed_chunk, chunk) for chunk in chunks]
-            for future in as_completed(futures):
-                embeddings.append(future.result())
-
-        print(f"✅ Embedded {len(embeddings)} chunks")
-        return embeddings
-
+        print(f"Created and persisted vector store with {len(chunks)} chunks")
 
     def load_vectorstore(self) -> None:
         """Loads an existing vector store from disk."""
@@ -143,6 +125,5 @@ class HarryPotterRAG:
         chunks = self.split_documents(documents)
         self.create_vectorstore(chunks, recreate=recreate)
         print("🏗️ Index build complete")
-
 
 
