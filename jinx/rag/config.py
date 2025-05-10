@@ -3,8 +3,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-GEMINI_API_KEY = os.getenv("GOOGLE_API_KEY")
-print(GEMINI_API_KEY)
+GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
 
 GOOGLE_CREDENTIALS_PATH = os.path.expanduser("~/.config/gcloud/application_default_credentials.json")
 CHROMA_PATH = "chroma"

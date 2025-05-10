@@ -13,7 +13,7 @@ from langchain_google_genai import GoogleGenerativeAIEmbeddings, ChatGoogleGener
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 from .config import (
-    GEMINI_API_KEY, CHROMA_PATH, DATA_PATH,
+    GOOGLE_API_KEY, CHROMA_PATH, DATA_PATH,
     CHUNK_SIZE, CHUNK_OVERLAP, MODEL_NAME, EMBEDDING_MODEL
 )
 
@@ -22,9 +22,9 @@ nltk.download('punkt')
 nltk.download('averaged_perceptron_tagger')
 
 # Configure Gemini
-if not GEMINI_API_KEY:
-    raise ValueError("GEMINI_API_KEY environment variable is not set")
-genai.configure(api_key=GEMINI_API_KEY)
+if not GOOGLE_API_KEY:
+    raise ValueError("GOOGLE_API_KEY environment variable is not set")
+genai.configure(api_key=GOOGLE_API_KEY)
 print("✅ Gemini API configured")
 
 
