@@ -10,6 +10,7 @@ from langchain.schema import Document
 from langchain.prompts import ChatPromptTemplate
 import google.generativeai as genai
 from langchain_google_genai import GoogleGenerativeAIEmbeddings, ChatGoogleGenerativeAI
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 from .config import (
     GEMINI_API_KEY, CHROMA_PATH, DATA_PATH,
@@ -66,13 +67,34 @@ class HarryPotterRAG:
             shutil.rmtree(self.chroma_path)
             print(f"🧹 Existing vector store at {self.chroma_path} cleared")
 
-        self.vectorstore = Chroma.from_documents(
+        # 🚀 NEW: Parallel embedding
+        embeddings = self.embed_all_chunks(chunks)
+
+        # Build from precomputed embeddings
+        self.vectorstore = Chroma.from_embeddings(
+            embeddings=embeddings,
             documents=chunks,
-            embedding=self.embedding_model,
             persist_directory=self.chroma_path
         )
         self.vectorstore.persist()
         print(f"✅ Vector store created with {len(chunks)} chunks")
+
+    def embed_all_chunks(self, chunks: List[Document], max_workers: int = 5) -> List[List[float]]:
+        """Embeds all document chunks in parallel."""
+        print(f"🚀 Embedding {len(chunks)} chunks with {max_workers} workers...")
+
+        def embed_chunk(chunk):
+            return self.embedding_model.embed_documents([chunk.page_content])[0]
+
+        embeddings = []
+        with ThreadPoolExecutor(max_workers=max_workers) as executor:
+            futures = [executor.submit(embed_chunk, chunk) for chunk in chunks]
+            for future in as_completed(futures):
+                embeddings.append(future.result())
+
+        print(f"✅ Embedded {len(embeddings)} chunks")
+        return embeddings
+
 
     def load_vectorstore(self) -> None:
         """Loads an existing vector store from disk."""
@@ -122,24 +144,5 @@ class HarryPotterRAG:
         self.create_vectorstore(chunks, recreate=recreate)
         print("🏗️ Index build complete")
 
-# class DocumentLoader:
-#     def __init__(self, data_path: str):
-#         self.data_path = data_path
-#
-#     def load_documents(self) -> List[Document]:
-#         """Loads Markdown documents from the data directory."""
-#         loader = DirectoryLoader(self.data_path, glob="**/*.md")
-#         documents = loader.load()
-#         print(f"📄 Loaded {len(documents)} documents")
-#         return documents
-#
-# def main():
-#     DATA_PATH = "../data"
-#     loader = DocumentLoader(DATA_PATH)
-#     documents = loader.load_documents()
-#     # You can process the documents here if needed
-#     for doc in documents:  # Preview first 3
-#         print(f"📝 {doc.metadata['source']}")
-#
-# if __name__ == "__main__":
-#     main()
+
+

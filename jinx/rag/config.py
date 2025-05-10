@@ -8,8 +8,8 @@ GOOGLE_CREDENTIALS_PATH = os.path.expanduser("~/.config/gcloud/application_defau
 
 CHROMA_PATH = "chroma"
 DATA_PATH = "data"
-CHUNK_SIZE = 1000
-CHUNK_OVERLAP = 200
+CHUNK_SIZE = 2000
+CHUNK_OVERLAP = 150
 MODEL_NAME = "gemini-1.5-flash-latest"
 EMBEDDING_MODEL = "models/embedding-001"
 
