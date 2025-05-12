@@ -1,12 +1,16 @@
 import hashlib
 import os
+from typing import List
+
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 
 from rag.config import DATA_PATH
 from rag.rag_system import HarryPotterRAG  # NEW
+from server.templates import PROMPT_TEMPLATES
 
 app = FastAPI()
 rag = HarryPotterRAG()
+
 
 @app.on_event("startup")
 async def startup_event():
@@ -26,10 +30,6 @@ async def startup_event():
             rag.build_index_pipeline()
             write_hash(current_hash)
 
-def write_hash(hash_value: str, filepath="vectorstore_hash.txt"):
-    with open(filepath, "w") as f:
-        f.write(hash_value)
-
 
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
@@ -47,11 +47,19 @@ async def websocket_endpoint(websocket: WebSocket):
     except WebSocketDisconnect:
         print("🔌 Client disconnected")
 
+@app.get("/prompt-styles", response_model=List[dict])
+def get_prompt_styles():
+    return [
+        {"key": key.lower().replace(" ", "_"), "display_name": key}
+        for key in PROMPT_TEMPLATES.keys()
+    ]
+
 async def stream_chunks(generator):
     for chunk in generator:
         if isinstance(chunk, dict):
             continue  # You can expand this to send source docs
         yield chunk
+
 
 def compute_documents_hash(data_path: str = DATA_PATH) -> str:
     hash_md5 = hashlib.md5()
@@ -66,8 +74,14 @@ def compute_documents_hash(data_path: str = DATA_PATH) -> str:
 
     return hash_md5.hexdigest()
 
+
 def read_stored_hash(filepath="vectorstore_hash.txt") -> str:
     if os.path.exists(filepath):
         with open(filepath, "r") as f:
             return f.read().strip()
     return ""
+
+
+def write_hash(hash_value: str, filepath="vectorstore_hash.txt"):
+    with open(filepath, "w") as f:
+        f.write(hash_value)
