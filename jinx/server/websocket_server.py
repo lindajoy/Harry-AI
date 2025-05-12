@@ -3,6 +3,7 @@ import os
 from typing import List
 
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from sympy.physics.vector.printing import params
 
 from rag.config import DATA_PATH
 from rag.rag_system import HarryPotterRAG  # NEW
@@ -34,15 +35,26 @@ async def startup_event():
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
+    params = websocket.query_params
     try:
         while True:
             data = await websocket.receive_text()
-            print(f"💬 Received: {data}")
+            voice = params.get("voice", "en-US-Wavenet-D")
+            print(f"💬 Received: {data} {voice}")
 
-            generator = rag.query(data)
+            if voice not in PROMPT_TEMPLATES:
+                await websocket.send_text(f"❌ Error: Voice '{voice}' not supported.")
+                await websocket.send_text("__END__")
+                continue  # Skip processing this message
+
+            generator = rag.query(query_text=data, style=voice)
             async for chunk in stream_chunks(generator):
                 await websocket.send_text(chunk)
             await websocket.send_text("__END__")
+
+    except WebSocketDisconnect:
+        print("🔌 Client disconnected")
+
 
     except WebSocketDisconnect:
         print("🔌 Client disconnected")
@@ -53,6 +65,7 @@ def get_prompt_styles():
         {"key": key.lower().replace(" ", "_"), "display_name": key}
         for key in PROMPT_TEMPLATES.keys()
     ]
+
 
 async def stream_chunks(generator):
     for chunk in generator:
