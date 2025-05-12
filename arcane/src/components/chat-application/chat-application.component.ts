@@ -1,8 +1,8 @@
-import { Component, inject, OnDestroy, OnInit } from '@angular/core';
-import { HeaderGenerationComponent } from '../header-generation/header-generation.component';
-import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ChatService } from '../../services/chat.service';
 import { CommonModule } from '@angular/common';
+import { Component, inject, OnDestroy, OnInit } from '@angular/core';
+import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+
+import { ChatService } from '../../services/chat.service';
 import { WebsocketService } from '../../services/web.socket.service';
 
 @Component({
@@ -31,22 +31,6 @@ export class ChatApplicationComponent implements OnInit, OnDestroy {
     includeSources: new FormControl(false),
   });
 
-  tones = [
-    { value: "professional", label: "Professional" },
-    { value: "genz", label: "Gen Z" },
-    { value: "casual", label: "Casual" },
-    { value: "academic", label: "Academic" },
-  ];
-
-  atitudes = [
-    { value: "wizard", label: "Wizard" },
-    { value: "sacarstic", label: "sacarstic" },
-    { value: "quirky", label: "quirky" },
-    { value: "Too cool to care", label: "Too cool to care" },
-    { value: "funny", label: "Funny" },
-
-  ]
-
   buffer = '';
 
   constructor() {
@@ -73,30 +57,23 @@ export class ChatApplicationComponent implements OnInit, OnDestroy {
   generateResponse(voice: boolean): void {
     this.isLoading = true;
     const formValue = this.formGroup.value ?? {};
-    this.wsService.sendMessage(JSON.stringify(formValue), voice);
-    this.isLoading = false;
-    debugger;
-  }
 
-  autoResize(event: Event): void {
-    const textarea = event.target as HTMLTextAreaElement;
-    textarea.style.height = 'auto'; // reset first
-    textarea.style.height = textarea.scrollHeight + 'px';
+    this.wsService.sendMessage(JSON.stringify(formValue), voice);
+
+    const subscription = this.wsService.messages$
+                               .subscribe(response => {
+                                  this.isLoading = false;
+                                  subscription.unsubscribe();
+                            });
   }
 
   resetError() {
     this.error = false;
   }
 
-  handleSubmit(event: Event): void {
-    event.preventDefault();
-    if (!this.question.trim()) return;
-
-    this.isLoading = true;
-    setTimeout(() => {
-      this.answer = `This would be the answer from your AI model about Harry Potter lore...`;
-      this.isLoading = false;
-    }, 1500);
+  handleClear(): void {
+    this.question = '';
+    this.answer = '';
   }
 
   displayRandomBooks() {
