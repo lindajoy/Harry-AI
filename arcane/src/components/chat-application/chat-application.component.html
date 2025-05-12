@@ -1,103 +1,119 @@
-<div class="fixed inset-0 flex items-center justify-center">
-    <div class="shadow-xl/30 border-2 border-solid border-chat-grey width w-150 p-10 rounded-xl">
-        <div class="flex flex-col space-y-1">
-            <h3 class="font-sans font-medium text-zinc-900 dark:text-zinc-900">
-                Harry Potter Chat Generator
-            </h3>
-            <p class="font-sans text-zinc-500 dark:text-zinc-900">
-                Ask the AI your Harry Potter questions and explore the magic!
-            </p>
+<div class="min-h-screen bg-[url('/hogwarts-bg.jpg')] bg-cover bg-center bg-fixed">
+  <div class="min-h-screen bg-gray backdrop-blur-sm flex flex-col items-center justify-center p-4">
+    <div class="w-full max-w-4xl bg-[#0c1c2c]/90 rounded-xl shadow-2xl border border-amber-500/30 overflow-hidden">
+
+      <!-- Header -->
+      <div class="bg-gradient-to-r from-[#1a3a5f] to-[#0c1c2c] p-6 border-b border-amber-500/30">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="h-12 w-12 rounded-full bg-amber-500 flex items-center justify-center">
+              <img src="/assets/images/wand.png" alt="Hogwarts Logo" class="h-8 w-8" />
+            </div>
+            <div>
+              <h1 class="text-2xl font-bold text-amber-500 font-serif">The Wizarding Oracle</h1>
+              <p class="text-amber-300/80 text-sm">Explore the magical world of Harry Potter</p>
+            </div>
+          </div>
         </div>
-        <hr class="mt-6">
-        <form class="flex flex-col gap-2 flex-1 p-4 justify-between" [formGroup]="formGroup">
-            <div class="space-y-2">
-                <div class="flex items-center gap-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
-                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                        class="w-4 h-4 text-zinc-500">
-                        <path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"></path>
-                    </svg>
-                    <span class="text-sm text-zinc-500">Prompt</span>
+      </div>
+
+      <div class="p-6">
+        <div class="grid gap-6 md:grid-cols-5">
+          <div class="hidden md:block">
+            <div class="space-y-4">
+              <div class="bg-[#1a3a5f]/50 p-3 rounded-lg border border-amber-500/20 flex flex-col items-center cursor-pointer hover:bg-[#1a3a5f] red" *ngFor="let book of displayedBooks">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-8 w-8 text-amber-400">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" />
+                  </svg>
+                 <span class="text-xs  text-amber-300 mt-1 text-center">{{ book }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="md:col-span-4 space-y-6">
+            <div *ngIf="answer" class="h-[200px] bg-[#1a3a5f]/30 rounded-lg border border-amber-500/20 p-4 overflow-y-auto">
+              <div class="space-y-4">
+                <div class="bg-[#1a3a5f]/70 p-3 rounded-lg">
+                  <p class="text-sm font-medium text-amber-300">You asked:</p>
+                  <p class="text-white">{{ formGroup.value.prompt }}</p>
                 </div>
-                <textarea type="text" formControlName="prompt" name="prompt" rows="4"
-                    placeholder="Got a question about Dumbledore, Dementors, or Diagon Alley?"
-                    class="w-full bg-zinc-100 dark:bg-chat-grey text-sm text-chat-grey dark:text-black placeholder:text-zinc-500 rounded-xl p-2 border border-transparent focus:outline-none focus:border-zinc-900 dark:focus:border-zinc-100"></textarea>
+                <div class="bg-amber-500/10 p-3 rounded-lg border border-amber-500/30">
+                  <div class="flex items-center gap-2 mb-2">
+                    <i class="lucide lucide-sparkles h-4 w-4 text-amber-400"></i>
+                    <p class="text-sm font-medium text-amber-300">The Wizarding Oracle:</p>
+                  </div>
+                  <p class="text-white">{{ answer }}</p>
+                </div>
+              </div>
             </div>
 
-            <div class="flex items-center justify-between gap-4 mb-3">
-                <div class="flex items-center gap-2">
-                    <div class="flex items-center gap-1">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 text-zinc-500">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M19.114 5.636a9 9 0 0 1 0 12.728M16.463 8.288a5.25 5.25 0 0 1 0 7.424M6.75 8.25l4.72-4.72a.75.75 0 0 1 1.28.53v15.88a.75.75 0 0 1-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.009 9.009 0 0 1 2.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75Z" />
-                          </svg>      
-                        <span class="text-sm text-zinc-500">Tone</span>
+            <form class="space-y-4" [formGroup]="formGroup">
+              <div class="bg-[#1a3a5f]/30 rounded-lg border border-amber-500/20 p-4">
+                <textarea
+                  formControlName="prompt"
+                  name="question"
+                  placeholder="Ask something about Harry Potter..."
+                  class="min-h-[120px] w-full bg-[#1a3a5f]/50 border-amber-500/30 focus:border-amber-400 text-white placeholder:text-amber-100/30 resize-none p-2 rounded"
+                ></textarea>
+
+                <div class="mt-4 flex flex-col sm:flex-row gap-4 justify-between">
+                  <div class="flex flex-col sm:flex-row gap-4">
+                    <div class="space-y-2">
+                      <label class="text-amber-300 mr-4 text-sm">Response Style</label>
+                      <select formControlName="tone" name="character" class="w-[180px] bg-[#1a3a5f] border border-amber-500/30 text-amber-100 p-2 rounded">
+                        <option value="Severus Snape">Severus Snape</option>
+                        <option value="Hermione Granger">Hermione Granger</option>
+                        <option value="Rubeus Hagrid">Rubeus Hagrid</option>
+                        <option value="Neutral Scholar">Neutral Scholar</option>
+                        <option value="Shakespearean Style">Shakespearean Style</option>
+                        <option value="Corporate Tone">Corporate Tone</option>
+                        <option value="Albus Dumbledore">Albus Dumbledore</option>
+                      </select>
                     </div>
+                  </div>
 
-                    <select formControlName="tone"
-                        class="w-[160px] h-8 bg-white border border-zinc-200 dark:border-zinc-700 rounded-md px-2 text-sm focus:border-gray-400 focus:outline-none">
-                        @for(option of tones; track option.value) {
-                        <option [value]="option.value">{{ option.label }}</option>
-                        }
-                    </select>
+                  <button
+                  type="submit"
+                  class="bg-amber-500 hover:bg-amber-600 text-[#0c1c2c] font-medium flex items-center px-4 py-2 rounded"
+                  [disabled]="isLoading"
+                  (click)="generateResponse(false)"
+                >
+                  <ng-container *ngIf="isLoading; else notLoading">
+                    <div class="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-[#0c1c2c] border-t-transparent"></div>
+                    Casting Spell...
+                  </ng-container>
+                  <ng-template #notLoading>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6 mr-4">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 0 0-2.456 2.456ZM16.894 20.567 16.5 21.75l-.394-1.183a2.25 2.25 0 0 0-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 0 0 1.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 0 0 1.423 1.423l1.183.394-1.183.394a2.25 2.25 0 0 0-1.423 1.423Z" />
+                    </svg>  
+                    Reveal Knowledge
+                  </ng-template>
+                </button>
                 </div>
-            </div>
 
-            <!-- <div class="flex items-center justify-between gap-4 mb-3">
-                <div class="flex items-center gap-2">
-                    <div class="flex items-center gap-1">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 text-zinc-500">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="m3.75 13.5 10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75Z" />
-                        </svg>    
-                        <span class="text-sm text-zinc-500">Atitude</span>
-                    </div>
+              </div>
+              <div class="flex items-center space-x-2 mt-auto">
+                <input type="checkbox" formControlName="includeSources" name="sources" id="sources" />
+                <label for="sources" class="text-amber-300">Include book sources</label>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
 
-                    <select formControlName="attitude"
-                    class="w-[160px] h-8 bg-white border border-zinc-200 dark:border-zinc-700 rounded-md px-2 text-sm focus:border-gray-400 focus:outline-none">
-                    @for(option of atitudes; track option.value) {
-                    <option [value]="option.value">{{ option.label }}</option>
-                    }
-                </select>
-                </div>
-            </div> -->
-
-            <div class="flex items-center justify-between gap-4 mb-3">
-                <div class="flex items-center gap-2">
-                    <label class="inline-flex items-center space-x-2 cursor-pointer">
-                        <input 
-                          formControlName="includeSources"
-                          type="checkbox" 
-                          class="accent-black w-3 h-3 border border-gray-300 rounded-sm"
-                        >
-                        <span class="text-sm  text-zinc-500">Do you want to include sources in your reponse</span>
-                      </label>     
-                </div>
-            </div>
-
-            <button type="submit"
-                (click)="generateResponse()"
-                class="w-full h-9 flex items-center justify-center gap-2 border border-gray-500 bg-zinc-900 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-100 dark:text-zinc-900 text-white text-sm font-medium rounded-xl transition-colors self-end">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                    class="w-4 h-4">
-                    <path
-                        d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z">
-                    </path>
-                    <path d="M5 3v4"></path>
-                    <path d="M19 17v4"></path>
-                    <path d="M3 5h4"></path>
-                    <path d="M17 19h4"></path>
-                </svg>
-                Generate Answer
-            </button>
-            
-        </form>
-
-        @if(answer) {
-            <textarea [ngModel]="answer"   (input)="autoResize($event)"
-            rows="4"
-              placeholder="Response will appear here..."
-              class="w-full bg-zinc-200 dark:bg-chat-grey text-sm text-chat-grey dark:text-black placeholder:text-zinc-500 rounded-xl p-2 border border-transparent focus:outline-none focus:border-zinc-900 dark:focus:border-zinc-100">
-            </textarea>
-        }
+      <div class="bg-[#0c1c2c] p-4 border-t border-amber-500/30 text-xs text-amber-300/60 flex flex-col sm:flex-row justify-between items-center gap-4">
+        <p>Powered by magical AI trained on all seven Harry Potter books</p>
+        <div class="flex items-center gap-4">
+          <button class="hover:text-amber-300"  (click)="generateResponse(true)">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M19.114 5.636a9 9 0 0 1 0 12.728M16.463 8.288a5.25 5.25 0 0 1 0 7.424M6.75 8.25l4.72-4.72a.75.75 0 0 1 1.28.53v15.88a.75.75 0 0 1-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.009 9.009 0 0 1 2.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75Z" />
+            </svg>
+            Audio
+          </button>
+          <button class="hover:text-amber-300">About</button>
+          <button class="hover:text-amber-300">FAQ</button>
+        </div>
+      </div>
     </div>
+  </div>
 </div>

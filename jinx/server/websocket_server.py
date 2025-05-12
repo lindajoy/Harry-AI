@@ -8,6 +8,7 @@ from rag.rag_system import HarryPotterRAG  # NEW
 app = FastAPI()
 rag = HarryPotterRAG()
 
+print("🚀 Starting FastAPI server......")
 @app.on_event("startup")
 async def startup_event():
     current_hash = compute_documents_hash(DATA_PATH)
@@ -40,6 +41,7 @@ async def websocket_endpoint(websocket: WebSocket):
             print(f"💬 Received: {data}")
 
             generator = rag.query(data)
+            print(f"🔄 Generating response for: {data}")
             async for chunk in stream_chunks(generator):
                 await websocket.send_text(chunk)
             await websocket.send_text("__END__")

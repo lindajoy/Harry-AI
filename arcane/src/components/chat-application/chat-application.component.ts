@@ -1,8 +1,9 @@
-import { Component, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { HeaderGenerationComponent } from '../header-generation/header-generation.component';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ChatService } from '../../services/chat.service';
+import { CommonModule } from '@angular/common';
+import { WebsocketService } from '../../services/web.socket.service';
 
 @Component({
   selector: 'app-chat-application',
@@ -11,9 +12,18 @@ import { ChatService } from '../../services/chat.service';
   templateUrl: './chat-application.component.html',
   styleUrl: './chat-application.component.css'
 })
-export class ChatApplicationComponent {
+export class ChatApplicationComponent implements OnInit, OnDestroy {
+  books: string[] = ['Half Blood Prince', 'Deathly Hallows', 'Soceerers Stone', 'Goblet of fire', 'Order of the phoneix'];
+  displayedBooks: string[] = [];
   chatService = inject(ChatService);
+  wsService = inject(WebsocketService);
   answer: string = '';
+
+  question = '';
+  isLoading = false;
+  error = false;
+  character = 'dumbledore';
+  includeSources = false;
 
   formGroup = new FormGroup({
     prompt: new FormControl('', Validators.required),
@@ -34,13 +44,38 @@ export class ChatApplicationComponent {
     { value: "quirky", label: "quirky" },
     { value: "Too cool to care", label: "Too cool to care" },
     { value: "funny", label: "Funny" },
+
   ]
 
-  generateResponse() {
+  buffer = '';
+
+  constructor() {
+    this.displayRandomBooks();
+  }
+
+  ngOnInit() {
+    this.wsService.connect();
+  
+    this.wsService.messages$.subscribe((data: string) => {
+      if (data === '__END__') {
+        this.answer = this.buffer;
+        this.buffer = '';
+      } else {
+        this.buffer += data;
+      }
+    });
+  }
+  
+  ngOnDestroy() {
+    this.wsService.close();
+  }
+
+  generateResponse(voice: boolean): void {
+    this.isLoading = true;
     const formValue = this.formGroup.value ?? {};
-    this.chatService.generateResponse(formValue).subscribe((response: any) => {
-       this.answer = response.response;
-   })
+    this.wsService.sendMessage(JSON.stringify(formValue), voice);
+    this.isLoading = false;
+    debugger;
   }
 
   autoResize(event: Event): void {
@@ -48,5 +83,24 @@ export class ChatApplicationComponent {
     textarea.style.height = 'auto'; // reset first
     textarea.style.height = textarea.scrollHeight + 'px';
   }
-  
+
+  resetError() {
+    this.error = false;
+  }
+
+  handleSubmit(event: Event): void {
+    event.preventDefault();
+    if (!this.question.trim()) return;
+
+    this.isLoading = true;
+    setTimeout(() => {
+      this.answer = `This would be the answer from your AI model about Harry Potter lore...`;
+      this.isLoading = false;
+    }, 1500);
+  }
+
+  displayRandomBooks() {
+    const shuffled = [...this.books].sort(() => 0.5 - Math.random());
+    this.displayedBooks = shuffled.slice(0, 3);
+  }
 }
