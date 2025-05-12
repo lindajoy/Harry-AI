@@ -1,4 +1,3 @@
-// websocket.service.ts
 import { Injectable } from '@angular/core';
 import { Subject } from 'rxjs';
 
@@ -8,7 +7,7 @@ import { Subject } from 'rxjs';
 export class WebsocketService {
   private socket: WebSocket | undefined;
   private messageSubject = new Subject<string>();
-  public messages$ = this.messageSubject.asObservable(); // Expose as observable
+  public messages$ = this.messageSubject.asObservable(); 
 
   connect(): void {
     if (typeof window !== 'undefined') {
@@ -20,7 +19,7 @@ export class WebsocketService {
 
       this.socket.onmessage = (event) => {
         console.log('📩 Received from server:', event.data);
-        this.messageSubject.next(event.data); // Push to observable
+        this.messageSubject.next(event.data); 
       };
 
       this.socket.onclose = () => {
