@@ -29,7 +29,7 @@ export class ChatApplicationComponent implements OnInit, OnDestroy {
 
   formGroup = new FormGroup({
     prompt: new FormControl('', Validators.required),
-    tone: new FormControl('albus_dumbledore', Validators.required),
+    tone: new FormControl('Albus Dumbledore', Validators.required),
     includeSources: new FormControl(false),
   });
 
@@ -40,7 +40,7 @@ export class ChatApplicationComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.wsService.connect();
+    this.wsService.connect(this.formGroup?.value?.tone ?? 'Albus Dumbledore');
 
     this.wsService.messages$.subscribe((data: string) => {
       if (data === '__END__') {
@@ -60,7 +60,8 @@ export class ChatApplicationComponent implements OnInit, OnDestroy {
     this.isLoading = true;
     const formValue = this.formGroup.value ?? {};
 
-    this.wsService.sendMessage(JSON.stringify(formValue), voice);
+    this.wsService.sendMessage(JSON.stringify(formValue), formValue.tone as string);
+    debugger;
 
     const subscription = this.wsService.messages$
                                .subscribe(response => {
