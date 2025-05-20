@@ -79,7 +79,7 @@
                       <label class="text-amber-300 mr-4 text-sm">Response Style</label>
                       <select formControlName="tone" name="character" class="w-[180px] bg-[#1a3a5f] border border-amber-500/30 text-amber-100 p-2 rounded">
                           @for (prompt of promptStyles$ | async; track prompt.key) {
-                            <option [value]="prompt.key">{{ prompt.display_name }}</option>
+                            <option [value]="prompt.display_name">{{ prompt.display_name }}</option>
                           }
                       </select>
                     </div>
