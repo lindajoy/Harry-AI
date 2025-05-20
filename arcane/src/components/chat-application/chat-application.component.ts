@@ -38,7 +38,7 @@ export class ChatApplicationComponent implements OnInit, OnDestroy {
 
 
   constructor() {
-    this.displayRandomBooks();
+    // this.displayRandomBooks();
   }
 
   ngOnInit() {
@@ -85,10 +85,6 @@ export class ChatApplicationComponent implements OnInit, OnDestroy {
     this.answer = '';
   }
 
-  displayRandomBooks() {
-    const shuffled = [...this.books].sort(() => 0.5 - Math.random());
-    this.displayedBooks = shuffled.slice(0, 3);
-  }
 
   ngOnDestroy() {
     this.wsService.close();
