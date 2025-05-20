@@ -11,7 +11,7 @@ export class WebsocketService {
 
   connect(): void {
     if (typeof window !== 'undefined') {
-      this.socket = new WebSocket('ws://harry-ai-production.up.railway.app/ws');
+      this.socket = new WebSocket('wss://harry-ai-production.up.railway.app/ws');
 
       this.socket.onopen = () => {
         console.log('🔗 WebSocket connected');
