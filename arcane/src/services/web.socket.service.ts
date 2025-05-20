@@ -19,7 +19,6 @@ export class WebsocketService {
       };
 
       this.socket.onmessage = (event) => {
-        console.log('📩 Received from server:', event.data);
         this.messageSubject.next(event.data); 
       };
 
@@ -43,9 +42,14 @@ export class WebsocketService {
     console.log('🔗 WebSocket connected with voice:', voice)
     console.log(socketUrl);
   
-    this.socket.onopen = () => {
+    this.socket.onopen = (data) => {
       this.socket!.send(message);
     };
+
+    this.socket.onmessage = (event) => {
+      this.messageSubject.next(event.data); 
+    };
+
   
     this.socket.onerror = (err) => {
       console.error('❌ WebSocket error:', err);
@@ -55,7 +59,6 @@ export class WebsocketService {
       console.log('🔌 WebSocket closed');
     };
   }
-  
 
   close(): void {
     this.socket?.close();

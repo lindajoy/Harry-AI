@@ -34,6 +34,8 @@ export class ChatApplicationComponent implements OnInit, OnDestroy {
   });
 
   buffer = '';
+  private previousPrompt = ""
+
 
   constructor() {
     this.displayRandomBooks();
@@ -50,18 +52,22 @@ export class ChatApplicationComponent implements OnInit, OnDestroy {
         this.buffer += data;
       }
     });
-  }
-  
-  ngOnDestroy() {
-    this.wsService.close();
-  }
 
-  generateResponse(voice: boolean): void {
+    this.formGroup.get("prompt")?.valueChanges.subscribe((value) => {
+      const currentPrompt = value || ""
+
+      if (this.answer && this.previousPrompt && currentPrompt !== this.previousPrompt) {
+        this.answer = "" 
+      }
+      this.previousPrompt = currentPrompt
+    })
+  }
+ 
+  generateResponse(): void {
     this.isLoading = true;
     const formValue = this.formGroup.value ?? {};
 
-    this.wsService.sendMessage(JSON.stringify(formValue), formValue.tone as string);
-    debugger;
+    this.wsService.sendMessage(JSON.stringify(formValue.prompt), formValue.tone as string);
 
     const subscription = this.wsService.messages$
                                .subscribe(response => {
@@ -82,5 +88,9 @@ export class ChatApplicationComponent implements OnInit, OnDestroy {
   displayRandomBooks() {
     const shuffled = [...this.books].sort(() => 0.5 - Math.random());
     this.displayedBooks = shuffled.slice(0, 3);
+  }
+
+  ngOnDestroy() {
+    this.wsService.close();
   }
 }
