@@ -78,13 +78,9 @@
                     <div class="space-y-2">
                       <label class="text-amber-300 mr-4 text-sm">Response Style</label>
                       <select formControlName="tone" name="character" class="w-[180px] bg-[#1a3a5f] border border-amber-500/30 text-amber-100 p-2 rounded">
-                        <option value="Severus Snape">Severus Snape</option>
-                        <option value="Hermione Granger">Hermione Granger</option>
-                        <option value="Rubeus Hagrid">Rubeus Hagrid</option>
-                        <option value="Neutral Scholar">Neutral Scholar</option>
-                        <option value="Shakespearean Style">Shakespearean Style</option>
-                        <option value="Corporate Tone">Corporate Tone</option>
-                        <option value="Albus Dumbledore">Albus Dumbledore</option>
+                          @for (prompt of promptStyles$ | async; track prompt.key) {
+                            <option [value]="prompt.key">{{ prompt.display_name }}</option>
+                          }
                       </select>
                     </div>
                   </div>
@@ -133,4 +129,4 @@
       </div>
     </div>
   </div>
-</div>
+  </div>

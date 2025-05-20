@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 
-import { ChatService } from '../../services/chat.service';
+import { PromptService } from '../../services/chat.service';
 import { WebsocketService } from '../../services/web.socket.service';
 
 @Component({
@@ -15,9 +15,11 @@ import { WebsocketService } from '../../services/web.socket.service';
 export class ChatApplicationComponent implements OnInit, OnDestroy {
   books: string[] = ['Half Blood Prince', 'Deathly Hallows', 'Soceerers Stone', 'Goblet of fire', 'Order of the phoneix'];
   displayedBooks: string[] = [];
-  chatService = inject(ChatService);
+  chatService = inject(PromptService);
   wsService = inject(WebsocketService);
   answer: string = '';
+
+  promptStyles$ = this.chatService.generatePrompts();
 
   question = '';
   isLoading = false;
@@ -27,7 +29,7 @@ export class ChatApplicationComponent implements OnInit, OnDestroy {
 
   formGroup = new FormGroup({
     prompt: new FormControl('', Validators.required),
-    tone: new FormControl('', Validators.required),
+    tone: new FormControl('albus_dumbledore', Validators.required),
     includeSources: new FormControl(false),
   });
 
@@ -39,7 +41,7 @@ export class ChatApplicationComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.wsService.connect();
-  
+
     this.wsService.messages$.subscribe((data: string) => {
       if (data === '__END__') {
         this.answer = this.buffer;
