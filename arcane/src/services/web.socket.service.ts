@@ -39,8 +39,6 @@ export class WebsocketService {
   
     const socketUrl = `wss://harry-ai-production.up.railway.app/ws?voice=${encodeURIComponent(voice)}`;
     this.socket = new WebSocket(socketUrl);
-    console.log('🔗 WebSocket connected with voice:', voice)
-    console.log(socketUrl);
   
     this.socket.onopen = (data) => {
       this.socket!.send(message);
@@ -50,7 +48,6 @@ export class WebsocketService {
       this.messageSubject.next(event.data); 
     };
 
-  
     this.socket.onerror = (err) => {
       console.error('❌ WebSocket error:', err);
     };
