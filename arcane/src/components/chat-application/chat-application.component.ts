@@ -36,14 +36,12 @@ export class ChatApplicationComponent implements OnInit, OnDestroy {
   buffer = '';
   private previousPrompt = ""
 
-
   constructor() {
     this.displayRandomBooks();
   }
 
   ngOnInit() {
     this.wsService.connect(this.formGroup?.value?.tone ?? 'Albus Dumbledore');
-
     this.wsService.messages$.subscribe((data: string) => {
       if (data === '__END__') {
         this.answer = this.buffer;
