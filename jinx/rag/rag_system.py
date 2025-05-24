@@ -1,18 +1,17 @@
 import os
 import shutil
-import time
 from typing import List
-import nltk
 
-from langchain_community.document_loaders import DirectoryLoader
-from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain_community.vectorstores import Chroma
-from langchain.schema import Document
-from langchain.prompts import ChatPromptTemplate
 import google.generativeai as genai
+import nltk
+from langchain.prompts import ChatPromptTemplate
+from langchain.schema import Document
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain_community.document_loaders import DirectoryLoader
+from langchain_community.vectorstores import Chroma
 from langchain_google_genai import GoogleGenerativeAIEmbeddings, ChatGoogleGenerativeAI
-from concurrent.futures import ThreadPoolExecutor, as_completed
 
+from server.templates import PROMPT_TEMPLATES
 from .config import (
     GOOGLE_API_KEY, CHROMA_PATH, DATA_PATH,
     CHUNK_SIZE, CHUNK_OVERLAP, MODEL_NAME, EMBEDDING_MODEL
@@ -48,7 +47,6 @@ class HarryPotterRAG:
         for doc in documents:  # Preview first
             print(f"📝 {doc.metadata['source']}")
         return documents
-
 
     def split_documents(self, documents: List[Document]) -> List[Document]:
         """Splits documents into overlapping text chunks for vector storage."""
@@ -89,26 +87,17 @@ class HarryPotterRAG:
         )
         print(f"📦 Vector store loaded from {self.chroma_path}")
 
-    def query(self, query_text: str, k: int = 3):
-        """Executes a query and streams the Gen Z styled response."""
+    def query(self, query_text: str, k: int = 3, style: str = "gen_z_hp"):
+        """Executes a query and streams a styled response based on prompt style."""
         if not self.vectorstore:
             self.load_vectorstore()
 
         docs = self.vectorstore.similarity_search(query_text, k=k)
         context = "\n\n---\n\n".join([doc.page_content for doc in docs])
 
-        prompt = ChatPromptTemplate.from_template("""
-        Yo bestie, you’re a **savage AI assistant** fluent in **Gen Z lingo + brain rot vibes** 😤✨.
-        Your mission? Drop 🔥 answers to the question below, but ONLY based on the **magical context** provided.
-
-        Context: {context}
-
-        💭 **Question:** {question}
-
-        📝 **Your Answer:**
-        - Gen Z slang + Harry Potter vibes
-        - Keep it 🔥 and on point
-        """)
+        prompt = ChatPromptTemplate.from_template(PROMPT_TEMPLATES.get(style))
+        if not prompt:
+            raise ValueError(f"Unknown prompt style: {style}")
 
         chain = prompt | self.llm
         stream = chain.stream({"context": context, "question": query_text})
@@ -117,6 +106,7 @@ class HarryPotterRAG:
             content = getattr(chunk, "content", None)
             if content:
                 yield content
+
         yield {"source_documents": docs}
 
     def build_index_pipeline(self, recreate: bool = False) -> None:
@@ -125,5 +115,3 @@ class HarryPotterRAG:
         chunks = self.split_documents(documents)
         self.create_vectorstore(chunks, recreate=recreate)
         print("🏗️ Index build complete")
-
-
